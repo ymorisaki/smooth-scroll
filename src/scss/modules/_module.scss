@@ -1,1 +1,18 @@
 @charset "UTF-8";
+
+.scroll-anc {
+  display: flex;
+
+  > li {
+    list-style: none;
+    margin-right: 10px;
+  }
+}
+
+.null {
+  height: 2000px;
+}
+
+.box {
+  margin-bottom: 30px;
+}
