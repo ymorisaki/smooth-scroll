@@ -11650,11 +11650,11 @@ __webpack_require__.r(__webpack_exports__);
 function smoothScroll() {
   'use strict';
 
-  var firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe');
   var anc = document.getElementsByTagName('a');
   var ancLength = anc.length;
   var i = 0;
-  var pageInnerAncList = []; // ページ内リンクの要素を取得
+  var pageInnerAncList = [];
+  var firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe'); // ページ内リンクの要素を取得
 
   for (; i < ancLength; i++) {
     var ancHref = anc[i].getAttribute('href');
@@ -11713,7 +11713,8 @@ function smoothScroll() {
       },
       clickHandler: function clickHandler() {
         var self = this;
-        var isScroll = false;
+        var isScroll = false; // 連打対策
+
         this.root.addEventListener('click', function (e) {
           e.preventDefault();
 
@@ -11725,20 +11726,28 @@ function smoothScroll() {
           var targetHash = thisEl.getAttribute('href');
           var targetId = targetHash.replace(/^#/, '');
           var target = document.getElementById(targetId);
-          var targetPosition = null;
-          var startPosition = window.pageYOffset || window.scrollY;
-          var elapsedTime = 0;
-          var next = null;
-          var timeStart = null;
-          var toTop = false;
+          var startPosition = window.pageYOffset || window.scrollY; // クリックした時の縦軸の座標
+
+          var targetPosition = null; // ページ内リンクかトップへのリンクかにより変動するため宣言のみ行う
+
+          var timeStart = null; // アニメーション開始時間
+
+          var elapsedTime = 0; // アニメーション中の経過時間
+
+          var toTop = false; // ページ内リンクかトップへのリンクか判定
+
+          var next = null; // ポジション移動のためのイージングの数値を代入する変数
 
           var move = function move(timeCurrent) {
             return new Promise(function (resolve) {
+              // アニメーション開始時間を設定
               if (!timeStart) {
                 timeStart = timeCurrent;
-              }
+              } // アニメーション終了時の処理
+
 
               if (elapsedTime >= self.duration) {
+                // ページ内リンクだった場合のフォーカス処理
                 if (target) {
                   target.setAttribute('tabindex', 0);
                   target.focus();
@@ -11753,20 +11762,22 @@ function smoothScroll() {
               window.scrollTo(0, next);
               requestAnimationFrame(move);
             }).then(function () {
-              isScroll = false;
+              isScroll = false; // 連打対策解除
 
               if (target) {
+                // ページ内リンクの場合のフォーカス処理
                 target.removeAttribute('tabindex');
               }
 
               if (toTop) {
+                // トップへのリンクの場合のフォーカス処理
                 firstFocusableElement.focus();
                 firstFocusableElement.blur();
               }
             });
           };
 
-          isScroll = true;
+          isScroll = true; // 連打対策開始
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;

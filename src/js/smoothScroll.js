@@ -48,7 +48,7 @@ export function smoothScroll() {
   }
 
   // 機能実行
-  pageInnerAncList.forEach(function (i) {
+  pageInnerAncList.forEach( i => {
     setSmoothScroll(i);
   });
 
@@ -98,7 +98,7 @@ export function smoothScroll() {
         let self = this;
         let isScroll = false; // 連打対策
 
-        this.root.addEventListener('click', function (e) {
+        this.root.addEventListener('click', e => {
           e.preventDefault();
 
           if (isScroll) {
@@ -116,8 +116,8 @@ export function smoothScroll() {
           let toTop = false; // ページ内リンクかトップへのリンクか判定
           let next = null; // ポジション移動のためのイージングの数値を代入する変数
 
-          let move = (timeCurrent) => {
-            return new Promise( (resolve) => {
+          let move = timeCurrent => {
+            return new Promise( resolve => {
 
               // アニメーション開始時間を設定
               if (!timeStart) {
