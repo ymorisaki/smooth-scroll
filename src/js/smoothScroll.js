@@ -96,7 +96,7 @@ export function smoothScroll() {
 
       clickHandler: function () {
         let self = this;
-        let isScroll = false;
+        let isScroll = false; // 連打対策
 
         this.root.addEventListener('click', function (e) {
           e.preventDefault();
@@ -109,18 +109,24 @@ export function smoothScroll() {
           let targetHash = thisEl.getAttribute('href');
           let targetId = targetHash.replace(/^#/, '');
           let target = document.getElementById(targetId);
-          let targetPosition = null;
-          let startPosition = window.pageYOffset || window.scrollY;
-          let elapsedTime = 0;
-          let next = null;
-          let timeStart = null;
-          let toTop = false;
+          let startPosition = window.pageYOffset || window.scrollY; // クリックした時の縦軸の座標
+          let targetPosition = null; // ページ内リンクかトップへのリンクかにより変動するため宣言のみ行う
+          let timeStart = null; // アニメーション開始時間
+          let elapsedTime = 0; // アニメーション中の経過時間
+          let toTop = false; // ページ内リンクかトップへのリンクか判定
+          let next = null; // ポジション移動のためのイージングの数値を代入する変数
+
           let move = (timeCurrent) => {
             return new Promise( (resolve) => {
+
+              // アニメーション開始時間を設定
               if (!timeStart) {
                 timeStart = timeCurrent;
               }
+
+              // アニメーション終了時の処理
               if (elapsedTime >= self.duration) {
+                // ページ内リンクだった場合のフォーカス処理
                 if (target) {
                   target.setAttribute('tabindex', 0);
                   target.focus();
@@ -128,23 +134,26 @@ export function smoothScroll() {
                 resolve();
                 return;
               }
+
               elapsedTime = timeCurrent - timeStart;
               next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
               window.scrollTo(0, next);
               requestAnimationFrame(move);
             }).then( () => {
-              isScroll = false;
-              if (target) {
+              isScroll = false; // 連打対策解除
+
+              if (target) { // ページ内リンクの場合のフォーカス処理
                 target.removeAttribute('tabindex');
               }
-              if (toTop) {
+
+              if (toTop) { // トップへのリンクの場合のフォーカス処理
                 firstFocusableElement.focus();
                 firstFocusableElement.blur();
               }
             });
           };
 
-          isScroll = true;
+          isScroll = true; // 連打対策開始
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
