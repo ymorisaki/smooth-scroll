@@ -1,11 +1,27 @@
 @charset "UTF-8";
 
+h1 {
+  padding: 20px 0;
+  font-weight: normal;
+  text-align: center;
+  background-color: #789a36;
+  color: #fff;
+}
+
 .scroll-anc {
   display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0;
 
   > li {
     list-style: none;
     margin-right: 10px;
+
+    > a {
+      color: #777;
+      font-size: 20px;
+    }
   }
 }
 
