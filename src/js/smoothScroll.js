@@ -118,7 +118,7 @@ export function smoothScroll() {
               return;
             }
             if (toTop) {
-              history.pushState(null, null, '/');
+              history.pushState(null, null, '#top');
             } else {
               history.pushState(null, null, targetHash);
             }
