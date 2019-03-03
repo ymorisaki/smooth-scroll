@@ -11723,7 +11723,6 @@ function smoothScroll() {
           var elapsedTime = 0;
           var next = null;
           var timeStart = null;
-          var toTop = false;
 
           var move = function move(timeCurrent) {
             if (!timeStart) {
@@ -11734,12 +11733,6 @@ function smoothScroll() {
               return;
             }
 
-            if (toTop) {
-              history.pushState(null, null, '#top');
-            } else {
-              history.pushState(null, null, targetHash);
-            }
-
             elapsedTime = timeCurrent - timeStart;
             next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
             window.scrollTo(0, next);
@@ -11748,10 +11741,11 @@ function smoothScroll() {
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
+            history.pushState(null, null, targetHash);
             move();
           } else if (targetHash === '#') {
             targetPosition = "-".concat(startPosition);
-            toTop = true;
+            history.pushState(null, null, '#top');
             move();
           } else {
             return;

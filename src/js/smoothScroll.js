@@ -108,7 +108,6 @@ export function smoothScroll() {
           let elapsedTime = 0;
           let next = null;
           let timeStart = null;
-          let toTop = false;
 
           let move = (timeCurrent) => {
             if (!timeStart) {
@@ -116,11 +115,6 @@ export function smoothScroll() {
             }
             if (elapsedTime >= self.duration) {
               return;
-            }
-            if (toTop) {
-              history.pushState(null, null, '#top');
-            } else {
-              history.pushState(null, null, targetHash);
             }
             elapsedTime = timeCurrent - timeStart;
             next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
@@ -130,10 +124,11 @@ export function smoothScroll() {
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
+            history.pushState(null, null, targetHash);
             move();
           } else if (targetHash === '#') {
             targetPosition = `-${startPosition}`;
-            toTop = true;
+            history.pushState(null, null, '#top');
             move();
           } else {
             return;
