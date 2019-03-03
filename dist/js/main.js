@@ -11650,6 +11650,7 @@ __webpack_require__.r(__webpack_exports__);
 function smoothScroll() {
   'use strict';
 
+  var firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe');
   var anc = document.getElementsByTagName('a');
   var ancLength = anc.length;
   var i = 0;
@@ -11712,8 +11713,14 @@ function smoothScroll() {
       },
       clickHandler: function clickHandler() {
         var self = this;
+        var isScroll = false;
         this.root.addEventListener('click', function (e) {
           e.preventDefault();
+
+          if (isScroll) {
+            return;
+          }
+
           var thisEl = e.target;
           var targetHash = thisEl.getAttribute('href');
           var targetId = targetHash.replace(/^#/, '');
@@ -11723,21 +11730,43 @@ function smoothScroll() {
           var elapsedTime = 0;
           var next = null;
           var timeStart = null;
+          var toTop = false;
 
           var move = function move(timeCurrent) {
-            if (!timeStart) {
-              timeStart = timeCurrent;
-            }
+            return new Promise(function (resolve) {
+              if (!timeStart) {
+                timeStart = timeCurrent;
+              }
 
-            if (elapsedTime >= self.duration) {
-              return;
-            }
+              if (elapsedTime >= self.duration) {
+                if (target) {
+                  target.setAttribute('tabindex', 0);
+                  target.focus();
+                }
 
-            elapsedTime = timeCurrent - timeStart;
-            next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
-            window.scrollTo(0, next);
-            requestAnimationFrame(move);
+                resolve();
+                return;
+              }
+
+              elapsedTime = timeCurrent - timeStart;
+              next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
+              window.scrollTo(0, next);
+              requestAnimationFrame(move);
+            }).then(function () {
+              isScroll = false;
+
+              if (target) {
+                target.removeAttribute('tabindex');
+              }
+
+              if (toTop) {
+                firstFocusableElement.focus();
+                firstFocusableElement.blur();
+              }
+            });
           };
+
+          isScroll = true;
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
@@ -11746,6 +11775,7 @@ function smoothScroll() {
           } else if (targetHash === '#') {
             targetPosition = "-".concat(startPosition);
             history.pushState(null, null, '#top');
+            toTop = true;
             move();
           } else {
             return;

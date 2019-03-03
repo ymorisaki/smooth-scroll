@@ -37,6 +37,7 @@ export function smoothScroll() {
   let ancLength = anc.length;
   let i = 0;
   let pageInnerAncList = [];
+  const firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe');
 
   // ページ内リンクの要素を取得
   for (; i < ancLength; i++) {
@@ -95,9 +96,14 @@ export function smoothScroll() {
 
       clickHandler: function () {
         let self = this;
+        let isScroll = false;
 
         this.root.addEventListener('click', function (e) {
           e.preventDefault();
+
+          if (isScroll) {
+            return;
+          }
 
           let thisEl = e.target;
           let targetHash = thisEl.getAttribute('href');
@@ -108,19 +114,37 @@ export function smoothScroll() {
           let elapsedTime = 0;
           let next = null;
           let timeStart = null;
-
+          let toTop = false;
           let move = (timeCurrent) => {
-            if (!timeStart) {
-              timeStart = timeCurrent;
-            }
-            if (elapsedTime >= self.duration) {
-              return;
-            }
-            elapsedTime = timeCurrent - timeStart;
-            next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
-            window.scrollTo(0, next);
-            requestAnimationFrame(move);
+            return new Promise( (resolve) => {
+              if (!timeStart) {
+                timeStart = timeCurrent;
+              }
+              if (elapsedTime >= self.duration) {
+                if (target) {
+                  target.setAttribute('tabindex', 0);
+                  target.focus();
+                }
+                resolve();
+                return;
+              }
+              elapsedTime = timeCurrent - timeStart;
+              next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
+              window.scrollTo(0, next);
+              requestAnimationFrame(move);
+            }).then( () => {
+              isScroll = false;
+              if (target) {
+                target.removeAttribute('tabindex');
+              }
+              if (toTop) {
+                firstFocusableElement.focus();
+                firstFocusableElement.blur();
+              }
+            });
           };
+
+          isScroll = true;
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
@@ -129,6 +153,7 @@ export function smoothScroll() {
           } else if (targetHash === '#') {
             targetPosition = `-${startPosition}`;
             history.pushState(null, null, '#top');
+            toTop = true;
             move();
           } else {
             return;
