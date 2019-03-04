@@ -1,21 +1,10 @@
 export function smoothScroll() {
   'use strict';
-  let anc = document.getElementsByTagName('a');
-  let ancLength = anc.length;
-  let i = 0;
-  let pageInnerAncList = [];
+  let anc = document.querySelectorAll('a[href^="#"]');
   const firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe');
 
-  // ページ内リンクの要素を取得
-  for (; i < ancLength; i++) {
-    let ancHref = anc[i].getAttribute('href');
-    if (ancHref.match(/^#/)) {
-      pageInnerAncList.push(anc[i]);
-    }
-  }
-
   // 機能実行
-  pageInnerAncList.forEach( i => {
+  anc.forEach( i => {
     setSmoothScroll(i);
   });
 
