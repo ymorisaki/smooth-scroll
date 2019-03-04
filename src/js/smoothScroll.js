@@ -137,6 +137,12 @@ export function smoothScroll() {
               }
 
               elapsedTime = timeCurrent - timeStart;
+
+              // IEチラつき対策
+              if (isNaN(elapsedTime)) {
+                elapsedTime = 0;
+              }
+
               next = self.easing(elapsedTime, startPosition, targetPosition, self.duration);
               window.scrollTo(0, next);
               requestAnimationFrame(move);
