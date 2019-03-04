@@ -109,8 +109,9 @@ export function smoothScroll() {
           let targetHash = thisEl.getAttribute('href');
           let targetId = targetHash.replace(/^#/, '');
           let target = document.getElementById(targetId);
-          let startPosition = window.pageYOffset || window.scrollY; // クリックした時の縦軸の座標
+          let startPosition = window.pageYOffset; // クリックした時の縦軸の座標
           let targetPosition = null; // ページ内リンクかトップへのリンクかにより変動するため宣言のみ行う
+          let reachingPosition = null; // 最終的な到着地点
           let timeStart = null; // アニメーション開始時間
           let elapsedTime = 0; // アニメーション中の経過時間
           let toTop = false; // ページ内リンクかトップへのリンクか判定
@@ -141,6 +142,7 @@ export function smoothScroll() {
               requestAnimationFrame(move);
             }).then( () => {
               isScroll = false; // 連打対策解除
+              window.scrollTo(0, reachingPosition);
 
               if (target) { // ページ内リンクの場合のフォーカス処理
                 target.removeAttribute('tabindex');
@@ -157,6 +159,7 @@ export function smoothScroll() {
 
           if (target) {
             targetPosition = target.getBoundingClientRect().top;
+            reachingPosition = targetPosition + window.pageYOffset;
             history.pushState(null, null, targetHash);
             move();
           } else if (targetHash === '#') {
