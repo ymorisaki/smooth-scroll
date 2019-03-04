@@ -1,6 +1,6 @@
 export function smoothScroll() {
   'use strict';
-  let anc = document.querySelectorAll('a[href^="#"]');
+  const anc = document.querySelectorAll('a[href^="#"]');
   const firstFocusableElement = document.querySelector('a, area, input, button, select, option, textarea, output, summary, video, audio, object, embed, iframe');
 
   // 機能実行
@@ -64,11 +64,11 @@ export function smoothScroll() {
             return;
           }
 
-          let thisEl = e.target;
-          let targetHash = thisEl.getAttribute('href');
-          let targetId = targetHash.replace(/^#/, '');
-          let target = document.getElementById(targetId);
-          let startPosition = window.pageYOffset; // クリックした時の縦軸の座標
+          const thisEl = e.target;
+          const targetHash = thisEl.getAttribute('href');
+          const targetId = targetHash.replace(/^#/, '');
+          const target = document.getElementById(targetId);
+          const startPosition = window.pageYOffset; // クリックした時の縦軸の座標
           let targetPosition = null; // ページ内リンクかトップへのリンクかにより変動するため宣言のみ行う
           let reachingPosition = null; // 最終的な到着地点
           let timeStart = null; // アニメーション開始時間
